@@ -114,6 +114,17 @@ class UserServiceTest {
         assertThat(userEntity.getNickname()).isEqualTo("saaa22");
     }
     @Test
+    public void user를_로그인_시키면_마지막_로그인_시간이_변경된다() throws Exception {
+        //given
+        //when
+        userService.login(1);
+
+        //then
+        UserEntity userEntity = userService.getById(1);
+        assertThat(userEntity.getLastLoginAt()).isGreaterThan(0L);
+//        assertThat(userEntity.getLastLoginAt()).isEqualTo(????); FIXME
+    }
+    @Test
     public void PENDING_상태의_사용자는_인증_코드로_ACTIVE_시킬_수_있다() throws Exception {
         //given
         //when
@@ -131,6 +142,5 @@ class UserServiceTest {
         assertThatThrownBy(() -> {
             userService.verifyEmail(2,"aaaaaaaaaaaaa");
         }).isInstanceOf(CertificationCodeNotMatchedException.class);
-//        assertThat(userEntity.getLastLoginAt()).isEqualTo(????); FIXME
     }
 }
