@@ -23,3 +23,17 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
 
 - [h2-console](http://localhost:8080/h2-console)
 - [Openapi-doc](http://localhost:8080/swagger-ui.html)
+
+![img_4.png](img_4.png)
+* ### jpa와 h2 연결 테스트
+![img.png](img.png)
+* ### sava하는 코드들 중복
+![img_2.png](img_2.png)
+![img_5.png](img_5.png)
+![img_3.png](img_3.png)
+* 해결
+
+* ## UserService 리팩터링
+  * ### get은 애초에 데이터가 없으면 에러를 던진다는 의미가 내포되어 있음
+    * ![img_6.png](img_6.png)
+    * ![img_7.png](img_7.png)
