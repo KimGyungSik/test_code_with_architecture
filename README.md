@@ -50,3 +50,7 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
       * ![img_12.png](img_12.png)
     * #### JavaMailSender라는 Bean객체를 Mock으로 선언된 객체로 덮어쓰기 하는것
       * ![img_11.png](img_11.png)
+
+  * ### ObjectMapper
+    * ![img_13.png](img_13.png)
+    * ![img_14.png](img_14.png)
