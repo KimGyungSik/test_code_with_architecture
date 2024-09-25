@@ -1,30 +1,24 @@
 package com.example.demo.service;
 
-import com.example.demo.exception.CertificationCodeNotMatchedException;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.UserStatus;
-import com.example.demo.model.dto.UserCreateDto;
-import com.example.demo.model.dto.UserUpdateDto;
-import com.example.demo.repository.UserEntity;
-import org.assertj.core.api.Assertions;
+import com.example.demo.common.domain.exception.CertificationCodeNotMatchedException;
+import com.example.demo.common.domain.exception.ResourceNotFoundException;
+import com.example.demo.user.domain.UserStatus;
+import com.example.demo.user.domain.UserCreate;
+import com.example.demo.user.domain.UserUpdate;
+import com.example.demo.user.infrastructure.UserEntity;
+import com.example.demo.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
@@ -82,14 +76,14 @@ class UserServiceTest {
     @Test
     public void userCreateDto_를_이용하여_유저를_생성할_수_있다() throws Exception {
         //given
-        UserCreateDto userCreateDto = UserCreateDto.builder()
+        UserCreate userCreate = UserCreate.builder()
                 .email("0714kyun@naver.com")
                 .address("GEQ")
                 .nickname("saaa")
                 .build();
         BDDMockito.doNothing().when(mailSender).send(any(SimpleMailMessage.class));
         //when
-        UserEntity result = userService.create(userCreateDto);
+        UserEntity result = userService.create(userCreate);
 
         //then
         assertThat(result.getId()).isNotNull();
@@ -99,13 +93,13 @@ class UserServiceTest {
     @Test
     public void userUpdateDto_를_이용하여_유저를_수정할_수_있다() throws Exception {
         //given
-        UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+        UserUpdate userUpdate = UserUpdate.builder()
                 .address("Incheon")
                 .nickname("saaa22")
                 .build();
 
         //when
-        userService.update(1, userUpdateDto);
+        userService.update(1, userUpdate);
 
         //then
         UserEntity userEntity = userService.getById(1);

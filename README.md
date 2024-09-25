@@ -54,3 +54,5 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
   * ### ObjectMapper
     * ![img_13.png](img_13.png)
     * ![img_14.png](img_14.png)
+
+* ## UserCreateDto, UserUpdateDto들은 Service패키지에서 참조해야 하므로 domain패키지로 이동

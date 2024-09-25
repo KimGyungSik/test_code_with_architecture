@@ -1,12 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.UserStatus;
-import com.example.demo.model.dto.UserUpdateDto;
-import com.example.demo.repository.UserEntity;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.domain.UserStatus;
+import com.example.demo.user.domain.UserUpdate;
+import com.example.demo.user.infrastructure.UserEntity;
+import com.example.demo.user.infrastructure.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -67,6 +65,13 @@ class UserControllerTest {
         assertThat(userEntity.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
     @Test
+    public void 사용자는_인증_코드가_일치하지_않을_경우_권한_없음_에러를_내려준다() throws Exception {
+        mockMvc.perform(get("/api/users/2/verify")
+                        .queryParam("certificationCode", "aaaaaa-aaaaaa-aaaaaabcccccc"))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string("자격 증명에 실패하였습니다."));
+    }
+    @Test
     public void 사용자는_내_정보를_불러올_떄_개인정보인_주소도_갖고_올_수_있다() throws Exception {
         mockMvc.perform(get("/api/users/me")
                         .header("EMAIL","0711kyungh@naver.com"))
@@ -80,7 +85,7 @@ class UserControllerTest {
     @Test
     public void 사용자는_내_정보를_수정할_수_있다() throws Exception {
         //given
-        UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+        UserUpdate userUpdate = UserUpdate.builder()
                 .nickname("lok33")
                 .address("Pangli")
                 .build();
@@ -90,7 +95,7 @@ class UserControllerTest {
         mockMvc.perform(put("/api/users/me")
                         .header("EMAIL","0711kyungh@naver.com")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userUpdateDto))) // jackson serialize해서 컨텐츠로 넘겨줘야함 -> ObjectMapper 필요
+                        .content(objectMapper.writeValueAsString(userUpdate))) // jackson serialize해서 컨텐츠로 넘겨줘야함 -> ObjectMapper 필요
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("0711kyungh@naver.com"))
