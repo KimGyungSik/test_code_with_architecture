@@ -59,3 +59,8 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
 * ## UserRepository를 infrastructure에 두면 상위 모듈인 service에서 infrastructure인 패키지에 의존하는 그림이 되게 되는데 그렇게 되면 안되기 떄문에
   * ### -> service 쪽으로 이동
   * ### service에서 사용하는 인터페이스들을 port패키지에 몰아 넣어줌
+* ![img_15.png](img_15.png)
+  * ### MailSender를 주입해줘야하는데 fake로 만들어줌
+  * ### 실제로 어떤 값이 들어왔는지 볼 수 있게 멤버변수 선언
+    * ![img_16.png](img_16.png)
+    * ![img_17.png](img_17.png)
