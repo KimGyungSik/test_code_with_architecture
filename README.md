@@ -56,3 +56,6 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
     * ![img_14.png](img_14.png)
 
 * ## UserCreateDto, UserUpdateDto들은 Service패키지에서 참조해야 하므로 domain패키지로 이동
+* ## UserRepository를 infrastructure에 두면 상위 모듈인 service에서 infrastructure인 패키지에 의존하는 그림이 되게 되는데 그렇게 되면 안되기 떄문에
+  * ### -> service 쪽으로 이동
+  * ### service에서 사용하는 인터페이스들을 port패키지에 몰아 넣어줌
