@@ -2,6 +2,7 @@ package com.example.demo.user.service;
 
 import com.example.demo.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.demo.common.domain.exception.ResourceNotFoundException;
+import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserStatus;
 import com.example.demo.user.domain.UserCreate;
 import com.example.demo.user.domain.UserUpdate;
@@ -39,7 +40,7 @@ class UserServiceTest {
         String email = "0711kyungh@naver.com";
 
         //when
-        UserEntity result = userService.getByEmail(email);
+        User result = userService.getByEmail(email);
 
         //then
         assertThat(result.getNickname()).isEqualTo("lok22");
@@ -52,14 +53,14 @@ class UserServiceTest {
         //when
         //then
         assertThatThrownBy(() -> {
-            UserEntity result = userService.getByEmail(email);
+            User result = userService.getByEmail(email);
         }).isInstanceOf(ResourceNotFoundException.class);
     }
     @Test
     public void getById은_ACTIVE_상태인_유저를_찾아올_수_있다() throws Exception {
         //given
         //when
-        UserEntity result = userService.getById(1);
+        User result = userService.getById(1);
 
         //then
         assertThat(result.getNickname()).isEqualTo("lok22");
@@ -70,7 +71,7 @@ class UserServiceTest {
         //when
         //then
         assertThatThrownBy(() -> {
-            UserEntity result = userService.getById(2);
+            User result = userService.getById(2);
         }).isInstanceOf(ResourceNotFoundException.class);
     }
     @Test
@@ -83,7 +84,7 @@ class UserServiceTest {
                 .build();
         BDDMockito.doNothing().when(mailSender).send(any(SimpleMailMessage.class));
         //when
-        UserEntity result = userService.create(userCreate);
+        User result = userService.create(userCreate);
 
         //then
         assertThat(result.getId()).isNotNull();
@@ -102,10 +103,10 @@ class UserServiceTest {
         userService.update(1, userUpdate);
 
         //then
-        UserEntity userEntity = userService.getById(1);
-        assertThat(userEntity.getId()).isNotNull();
-        assertThat(userEntity.getAddress()).isEqualTo("Incheon");
-        assertThat(userEntity.getNickname()).isEqualTo("saaa22");
+        User user = userService.getById(1);
+        assertThat(user.getId()).isNotNull();
+        assertThat(user.getAddress()).isEqualTo("Incheon");
+        assertThat(user.getNickname()).isEqualTo("saaa22");
     }
     @Test
     public void user를_로그인_시키면_마지막_로그인_시간이_변경된다() throws Exception {
@@ -114,8 +115,8 @@ class UserServiceTest {
         userService.login(1);
 
         //then
-        UserEntity userEntity = userService.getById(1);
-        assertThat(userEntity.getLastLoginAt()).isGreaterThan(0L);
+        User user = userService.getById(1);
+        assertThat(user.getLastLoginAt()).isGreaterThan(0L);
 //        assertThat(userEntity.getLastLoginAt()).isEqualTo(????); FIXME
     }
     @Test
@@ -125,8 +126,8 @@ class UserServiceTest {
         userService.verifyEmail(2, "aaaaaa-aaaaaa-aaaaaab");
 
         //then
-        UserEntity userEntity = userService.getById(2);
-        assertThat(userEntity.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        User user = userService.getById(2);
+        assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
     @Test
     public void PENDING_상태의_사용자는_잘못된_인증_코드를_받으면_에러를_던진다() throws Exception {
