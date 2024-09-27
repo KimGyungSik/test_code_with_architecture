@@ -99,3 +99,9 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
     * #### 테스트 픽스처인 UserService를 Builder로 만들어주고 mock객체들을 주입시켜줌
       * ![img_33.png](img_33.png)
       * ![img_34.png](img_34.png)
+  * ### PostServiceTest -> 소형테스트로
+    * #### 해당 프로젝트에서는 userService 전부에 의존하는게 아니라 userRepository에만 의존하게 바꿔도 될듯함
+      * ![img_36.png](img_36.png)
+        * #### 하지만 해당 작업은 UserService를 또 구현해서 넣어주는게 귀찮아서 그냥 Repository에 의존하게 바꿔준거임
+        * #### MailSender나 Uuid 같은 건 게시물 작성할 떄 쓰지도 않는데 번거롭기 때문 -> 테스트가 신호를 보낸 것 (의존성을 줄이라고)
+      * ![img_37.png](img_37.png)
