@@ -23,11 +23,11 @@ public class Post {
         this.writer = writer;
     }
 
-    public static Post from(PostCreate postCreate,User user) {
+    public static Post from(PostCreate postCreate,User writer) {
         return Post.builder()
                 .content(postCreate.getContent())
                 .createdAt(Clock.systemUTC().millis())
-                .writer(user)
+                .writer(writer)
                 .build();
     }
 
