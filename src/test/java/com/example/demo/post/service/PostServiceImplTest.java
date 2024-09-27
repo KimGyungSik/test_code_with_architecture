@@ -6,29 +6,22 @@ import com.example.demo.post.domain.PostCreate;
 import com.example.demo.post.domain.PostUpdate;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserStatus;
-import com.example.demo.user.service.CertificationService;
-import com.example.demo.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class PostServiceTest {
+public class PostServiceImplTest {
 
-   private PostService postService;
+   private PostServiceImpl postService;
 
     @BeforeEach
     void init() {
         FakeMailSender fakeMailSender = new FakeMailSender();
         FakePostRepository fakePostRepository = new FakePostRepository();
         FakeUserRepository fakeUserRepository = new FakeUserRepository();
-        this.postService = PostService.builder()
+        this.postService = PostServiceImpl.builder()
                 .postRepository(fakePostRepository)
                 .userRepository(fakeUserRepository)
                 .clockHolder(new TestClockHolder(1678530673958L))

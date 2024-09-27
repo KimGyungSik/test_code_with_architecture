@@ -105,3 +105,76 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
         * #### 하지만 해당 작업은 UserService를 또 구현해서 넣어주는게 귀찮아서 그냥 Repository에 의존하게 바꿔준거임
         * #### MailSender나 Uuid 같은 건 게시물 작성할 떄 쓰지도 않는데 번거롭기 때문 -> 테스트가 신호를 보낸 것 (의존성을 줄이라고)
       * ![img_37.png](img_37.png)
+* ## 컨트롤러를 소형 테스트로 만들기
+  * ### 서비스를 Fake로 만들기엔 너무 번거러움 -> Service를 분리
+    * ![img_38.png](img_38.png)
+    * ![img_39.png](img_39.png)
+    * ![img_40.png](img_40.png)
+  * ### UserControllerTest
+    * #### 이렇게 stub(미리 준비된 값을 출력하는 것)하는 코드는 별로 -> 애초에 어떤 하위 클래스에 어떤 메서드가 호출되면 "이런 응답을 내려줘야 한다"라는 것 자체가 구현을 강제하는 것
+  ```java
+        @Test
+        public void 사용자는_특정_유저의_정보를_개인정보는_소거된채_전달_받을_수_있다() throws Exception {
+          // given
+           UserController userController = UserController.builder()
+                          .userReadService(new UserReadService() {
+         @Override
+               public User getByEmail(String email) {
+                return null;
+        }
+
+        @Override
+        public User getById(long id) {
+            return User.builder()
+                    .id(id)
+                    .email("0711kyungh@naver.com")
+                    .nickname("lok22")
+                    .address("Seoul")
+                    .certificationCode("aaaaaa-aaaaaa-aaaaaaa")
+                    .status(UserStatus.ACTIVE)
+                    .build();
+        }
+        }).build();
+  
+        // when
+        ResponseEntity<UserResponse> result = userController.getUserById(1);
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getId()).isEqualTo(1);
+        assertThat(result.getBody().getEmail()).isEqualTo("0711kyungh@naver.com");
+        assertThat(result.getBody().getNickname()).isEqualTo("lok22");
+        assertThat(result.getBody().getStatus()).isEqualTo(UserStatus.ACTIVE);
+     }
+  
+    @Test
+    public void 사용자는_존재하지_않는_유저의_아이디로_api_호출할_경우_404_응답을_받는다() throws Exception {
+    // given
+    UserController userController = UserController.builder()
+    .userReadService(new UserReadService() {
+    @Override
+    public User getByEmail(String email) {
+    return null;
+    }
+
+                    @Override
+                    public User getById(long id) {
+                        throw new ResourceNotFoundException("Users", id);
+                    }
+                }).build();
+        // when
+        // then
+        assertThatThrownBy(() -> {
+            userController.getUserById(123445);
+        }).isInstanceOf(ResourceNotFoundException.class);
+    }
+   ```
+     
+  * #### 롤백을 진행
+    * #### 대신에 TestContainer를 만들어서 스프링의 IoC 컨테이너를 흉내내는 코드를 작성
+    * #### CertificationService는 controller같은 외부 호출이 없으니 굳이 추상화 안해도 될듯
+     * ![img_42.png](img_42.png)   
+     * ![img_41.png](img_41.png)
+     * ![img_43.png](img_43.png)
+        
