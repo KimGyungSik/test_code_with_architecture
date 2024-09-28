@@ -177,4 +177,11 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
      * ![img_42.png](img_42.png)   
      * ![img_41.png](img_41.png)
      * ![img_43.png](img_43.png)
-        
+    * #### UserController도 번거러움으로 TesetContainer에 추가
+      * ![img_44.png](img_44.png)
+    * #### 고정된 시간만 내려주는 형태의 코드는 시간이 변경되었을 때 다른 동작을 가져야 하는 비즈니스 로직을 테스트하기 어려울 수 있음
+      * #### 테스트 중간중간에 원하는 시간대와 원하는 Uuid 값으로 바뀌게 할 수 있고, 시간 변화에 따른 비즈니스 로직 테스트를 할 수 있게 됨
+        * ![img_45.png](img_45.png)
+        * ![img_46.png](img_46.png)
+      * #### 테스트 케이스에서 TestClockHolder/TestUuidHolder를 다루기 위해 TestContainer아래와 같이 변경하는 것이 좋을 것임
+        * ![img_47.png](img_47.png)

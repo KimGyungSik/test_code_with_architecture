@@ -1,8 +1,11 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.demo.common.domain.exception.ResourceNotFoundException;
 import com.example.demo.mock.TestContainer;
+import com.example.demo.mock.TestUuidHolder;
 import com.example.demo.user.controller.port.UserReadService;
+import com.example.demo.user.controller.response.MyProfileResponse;
 import com.example.demo.user.controller.response.UserResponse;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserStatus;
@@ -15,9 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,10 +50,7 @@ class UserControllerTest {
                 .build());
 
         // when
-        ResponseEntity<UserResponse> result = UserController.builder()
-                .userReadService(testContainer.userReadService)
-                .build()
-                .getUserById(1);
+        ResponseEntity<UserResponse> result =testContainer.userController.getUserById(1);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
@@ -62,69 +64,118 @@ class UserControllerTest {
     @Test
     public void 사용자는_존재하지_않는_유저의_아이디로_api_호출할_경우_404_응답을_받는다() throws Exception {
         // given
-        UserController userController = UserController.builder()
-                .userReadService(new UserReadService() {
-                    @Override
-                    public User getByEmail(String email) {
-                        return null;
-                    }
+        TestContainer testContainer = TestContainer.builder().build();
 
-                    @Override
-                    public User getById(long id) {
-                        throw new ResourceNotFoundException("Users", id);
-                    }
-                }).build();
         // when
         // then
         assertThatThrownBy(() -> {
-            userController.getUserById(123445);
+            testContainer.userController.getUserById(1);
         }).isInstanceOf(ResourceNotFoundException.class);
     }
     @Test
     public void 사용자는_인증_코드로_계정을_활성화_시킬_수_있다() throws Exception {
-        mockMvc.perform(get("/api/users/2/verify")
-                        .queryParam("certificationCode", "aaaaaa-aaaaaa-aaaaaab"))
-                .andExpect(status().isFound());
-        UserEntity userEntity = userJpaRepository.findById(2L).get();
-        assertThat(userEntity.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        // given
+        TestContainer testContainer = TestContainer.builder()
+                .build();
+        testContainer.userRepository.save(User.builder()
+                .id(1L)
+                .email("0711kyungh@naver.com")
+                .nickname("lok22")
+                .address("Seoul")
+                .certificationCode("aaaaaa-aaaaaa-aaaaaaa")
+                .status(UserStatus.PENDING)
+                .lastLoginAt(100L)
+                .build());
+
+        // when
+        ResponseEntity<Void> result = testContainer.userController
+                .verifyEmail(1,"aaaaaa-aaaaaa-aaaaaaa");
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(result.getBody()).isNull();
+        assertThat(testContainer.userReadService.getById(1).getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
     @Test
     public void 사용자는_인증_코드가_일치하지_않을_경우_권한_없음_에러를_내려준다() throws Exception {
-        mockMvc.perform(get("/api/users/2/verify")
-                        .queryParam("certificationCode", "aaaaaa-aaaaaa-aaaaaabcccccc"))
-                .andExpect(status().isForbidden())
-                .andExpect(content().string("자격 증명에 실패하였습니다."));
+        // given
+        TestContainer testContainer = TestContainer.builder()
+                .build();
+        testContainer.userRepository.save(User.builder()
+                .id(1L)
+                .email("0711kyungh@naver.com")
+                .nickname("lok22")
+                .address("Seoul")
+                .certificationCode("aaaaaa-aaaaaa-aaaaaaa")
+                .status(UserStatus.PENDING)
+                .lastLoginAt(100L)
+                .build());
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+            testContainer.userController
+                    .verifyEmail(1,"aaaaaa-aaaaaa-aaaaaaabb");
+        }).isInstanceOf(CertificationCodeNotMatchedException.class);
     }
     @Test
     public void 사용자는_내_정보를_불러올_떄_개인정보인_주소도_갖고_올_수_있다() throws Exception {
-        mockMvc.perform(get("/api/users/me")
-                        .header("EMAIL","0711kyungh@naver.com"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.email").value("0711kyungh@naver.com"))
-                .andExpect(jsonPath("$.nickname").value("lok22"))
-                .andExpect(jsonPath("$.address").value("Seoul"))
-                .andExpect(jsonPath("$.status").value("ACTIVE"));
+        // given
+        TestContainer testContainer = TestContainer.builder()
+                .initialMillis(100).build();
+        testContainer.userRepository.save(User.builder()
+                .id(1L)
+                .email("0711kyungh@naver.com")
+                .nickname("lok22")
+                .address("Seoul")
+                .certificationCode("aaaaaa-aaaaaa-aaaaaaa")
+                .status(UserStatus.ACTIVE)
+                .lastLoginAt(50L)
+                .build());
+
+        // when
+        ResponseEntity<MyProfileResponse> result =testContainer.userController
+                .getMyInfo("0711kyungh@naver.com");
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getId()).isEqualTo(1);
+        assertThat(result.getBody().getEmail()).isEqualTo("0711kyungh@naver.com");
+        assertThat(result.getBody().getNickname()).isEqualTo("lok22");
+        assertThat(result.getBody().getAddress()).isEqualTo("Seoul");
+        assertThat(result.getBody().getStatus()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(result.getBody().getLastLoginAt()).isEqualTo(100);
     }
     @Test
-    public void 사용자는_내_정보를_수정할_수_있다() throws Exception {
-        //given
-        UserUpdate userUpdate = UserUpdate.builder()
-                .nickname("lok33")
-                .address("Pangli")
-                .build();
+    public void 사용자는_내_정보를_수정할_수_있다()  {
+        // given
+        TestContainer testContainer = TestContainer.builder().build();
+        testContainer.userRepository.save(User.builder()
+                .id(1L)
+                .email("0711kyungh@naver.com")
+                .nickname("lok22")
+                .address("Seoul")
+                .certificationCode("aaaaaa-aaaaaa-aaaaaaa")
+                .status(UserStatus.ACTIVE)
+                .lastLoginAt(100L)
+                .build());
 
-        //when
-        //then
-        mockMvc.perform(put("/api/users/me")
-                        .header("EMAIL","0711kyungh@naver.com")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userUpdate))) // jackson serialize해서 컨텐츠로 넘겨줘야함 -> ObjectMapper 필요
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.email").value("0711kyungh@naver.com"))
-                .andExpect(jsonPath("$.nickname").value("lok33"))
-                .andExpect(jsonPath("$.address").value("Pangli"))
-                .andExpect(jsonPath("$.status").value("ACTIVE"));
+        // when
+        ResponseEntity<MyProfileResponse> result =testContainer.userController
+                .updateMyInfo("0711kyungh@naver.com", UserUpdate.builder()
+                        .address("Busan")
+                        .nickname("Newha")
+                        .build());
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getId()).isEqualTo(1);
+        assertThat(result.getBody().getEmail()).isEqualTo("0711kyungh@naver.com");
+        assertThat(result.getBody().getNickname()).isEqualTo("Newha");
+        assertThat(result.getBody().getAddress()).isEqualTo("Busan");
+        assertThat(result.getBody().getStatus()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(result.getBody().getLastLoginAt()).isEqualTo(100);
     }
 }

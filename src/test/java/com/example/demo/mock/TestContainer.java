@@ -29,21 +29,30 @@ public class TestContainer {
     public final UserUpdateService userUpdateService;
     public final AuthenticationService authenticationService;
     public final CertificationService certificationService;
+    public final UserController userController;
+    public final UserCreateController userCreateController;
+    public final PostController postController;
+    public final PostCreateController postCreateController;
+    public final TestClockHolder testClockHolder;
+    public final TestUuidHolder testUuidHolder;
+
 
     @Builder
-    public TestContainer(ClockHolder clockHolder, UuidHolder uuidHolder) {
+    public TestContainer(long initialMillis, String initialUuid) {
+        this.testClockHolder = new TestClockHolder(initialMillis);
+        this.testUuidHolder = new TestUuidHolder(initialUuid);
         this.mailSender = new FakeMailSender();
         this.userRepository = new FakeUserRepository();
         this.postRepository = new FakePostRepository();
         this.postService = PostServiceImpl.builder()
                 .postRepository(this.postRepository)
                 .userRepository(this.userRepository)
-                .clockHolder(clockHolder)
+                .clockHolder(testClockHolder)
                 .build();
         this.certificationService = new CertificationService(this.mailSender);
         UserServiceImpl userService = UserServiceImpl.builder()
-                .uuidHolder(uuidHolder)
-                .clockHolder(clockHolder)
+                .uuidHolder(testUuidHolder)
+                .clockHolder(testClockHolder)
                 .userRepository(this.userRepository)
                 .certificationService(this.certificationService)
                 .build();
@@ -51,5 +60,21 @@ public class TestContainer {
         this.userCreateService = userService;
         this.userUpdateService = userService;
         this.authenticationService = userService;
+        this.userController = UserController.builder()
+                .userReadService(userReadService)
+                .userCreateService(userCreateService)
+                .userUpdateService(userUpdateService)
+                .authenticationService(authenticationService)
+                .build();
+        this.userCreateController = UserCreateController.builder()
+                .userCreateService(userCreateService)
+                .build();
+        this.postController = PostController.builder()
+                .userController(userController)
+                .postService(postService)
+                .build();
+        this.postCreateController = PostCreateController.builder()
+                .postService(postService)
+                .build();
     }
 }
