@@ -171,7 +171,7 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
     }
    ```
      
-  * #### 롤백을 진행
+  * ### 롤백을 진행
     * #### 대신에 TestContainer를 만들어서 스프링의 IoC 컨테이너를 흉내내는 코드를 작성
     * #### CertificationService는 controller같은 외부 호출이 없으니 굳이 추상화 안해도 될듯
      * ![img_42.png](img_42.png)   
@@ -185,3 +185,10 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
         * ![img_46.png](img_46.png)
       * #### 테스트 케이스에서 TestClockHolder/TestUuidHolder를 다루기 위해 TestContainer아래와 같이 변경하는 것이 좋을 것임
         * ![img_47.png](img_47.png)
+        
+* ## 마지막 리팩토링
+  * ### TestContainer를 쓰므로 UserService를 UserCreateService, UserReadService, UserUpdateService, AuthenticationService로 분리한 것이 필요 없을듯
+    * ![img_49.png](img_49.png) 
+    * ![img_48.png](img_48.png)
+    * ![img_50.png](img_50.png)
+  * ### 
