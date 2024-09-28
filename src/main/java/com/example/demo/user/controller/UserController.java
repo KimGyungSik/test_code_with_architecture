@@ -5,7 +5,6 @@ import com.example.demo.user.controller.response.MyProfileResponse;
 import com.example.demo.user.controller.response.UserResponse;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserUpdate;
-import com.example.demo.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,7 +35,7 @@ public class UserController {
 
     @ResponseStatus
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable long id) {
+    public ResponseEntity<UserResponse> getById(@PathVariable long id) {
         return ResponseEntity
             .ok()
             .body(UserResponse.from(userService.getById(id)));
@@ -50,32 +49,5 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.FOUND)
             .location(URI.create("http://localhost:3000"))
             .build();
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<MyProfileResponse> getMyInfo(
-        @Parameter(name = "EMAIL", in = ParameterIn.HEADER)
-        @RequestHeader("EMAIL") String email // 일반적으로 스프링 시큐리티를 사용한다면 UserPrincipal 에서 가져옵니다.
-    ) {
-        User user = userService.getByEmail(email);
-        userService.login(user.getId());
-        user = userService.getByEmail(email);
-        return ResponseEntity
-            .ok()
-            .body(MyProfileResponse.from(user));
-    }
-
-    @PutMapping("/me")
-    @Parameter(in = ParameterIn.HEADER, name = "EMAIL")
-    public ResponseEntity<MyProfileResponse> updateMyInfo(
-        @Parameter(name = "EMAIL", in = ParameterIn.HEADER)
-        @RequestHeader("EMAIL") String email, // 일반적으로 스프링 시큐리티를 사용한다면 UserPrincipal 에서 가져옵니다.
-        @RequestBody UserUpdate userUpdate
-    ) {
-        User user = userService.getByEmail(email);
-        user = userService.update(user.getId(), userUpdate);
-        return ResponseEntity
-            .ok()
-            .body(MyProfileResponse.from(user));
     }
 }

@@ -188,7 +188,11 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
         
 * ## 마지막 리팩토링
   * ### TestContainer를 쓰므로 UserService를 UserCreateService, UserReadService, UserUpdateService, AuthenticationService로 분리한 것이 필요 없을듯
-    * ![img_49.png](img_49.png) 
+    * ![img_49.png](img_49.png)
     * ![img_48.png](img_48.png)
     * ![img_50.png](img_50.png)
-  * ### 
+  * ### UserUpdate 도메인이 사용자한테 노출되어 있음
+    * #### user/controller/request 패키지를 만들어서 Http요청만 전문적으로 처리하는 UserUpdateRequest를 생성해서 애가 UserUpdate로 맵핑하는 도메인을 반환하는 메서드 작성
+      * ![img_51.png](img_51.png)
+  * ### 컨트롤러 메서드의 반환타입이 다르다 ? -> 책임이 제대로 분할이 안된 것 (UserController의 메서드 중 반환타입이 ResponseEntity<MyProfileResponse>인 메서드를 MyInfoController클래스를 생성하여 분리)
+    * ![img_52.png](img_52.png)
