@@ -293,10 +293,11 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
       * ![img_102.png](src/main/imageFile/image2/img_102.png)
   * ## 실기 전 추가사항
     * ### 의존성 역전 원리를 이용하여 외부를 다룰 것임 -> 인프라 서비스 추상화 (jpa, http통신, 이메일 발송)
-      * ![img_103.png](src/main/imageFile/image2/img_103.png)
-      * ![img_104.png](src/main/imageFile/image2/img_104.png)
-      * ![img_105.png](src/main/imageFile/image2/img_105.png)
-      * ![img_106.png](src/main/imageFile/image2/img_106.png)
+      * #### 의존성 역전은 의존 관계를 약화시킨다는 의미, 호출자와 구현체를 독립적으로 구성하겠다라는 의미 -> 테스트 가능성을 높임
+        * ![img_103.png](src/main/imageFile/image2/img_103.png)
+        * ![img_104.png](src/main/imageFile/image2/img_104.png)
+        * ![img_105.png](src/main/imageFile/image2/img_105.png)
+        * ![img_106.png](src/main/imageFile/image2/img_106.png)
     * ### 필요한 경우 mock으로 치환하여 테스트
       * ![img_107.png](src/main/imageFile/image2/img_107.png)
       * ![img_108.png](src/main/imageFile/image2/img_108.png)
