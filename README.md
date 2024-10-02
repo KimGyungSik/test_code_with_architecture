@@ -505,3 +505,51 @@ h2를 이용하여 `auto create table`을 하고 있기 때문에 바로 실행�
         * ![img_51.png](src/test/resources/image/img_51.png)
     * ### 컨트롤러 메서드의 반환타입이 다르다 ? -> 책임이 제대로 분할이 안된 것 (UserController의 메서드 중 반환타입이 ResponseEntity<MyProfileResponse>인 메서드를 MyInfoController클래스를 생성하여 분리)
       * ![img_52.png](src/test/resources/image/img_52.png)
+    
+
+* # 진화하는 아키텍처
+  * ## 핵사고날 아키텍처 (1)
+    * ### 테스트하기 쉬운 쪽으로 개발 -> 정답일 확률이 높음
+    * ### 아키텍처의 정의 : 아키텍처란 어떤 비즈니스 문제를 해결하기 위해, 준수해야하는 제약을 넣는 과정
+    * ### 아키텍처의 목표
+      * #### -> 인적 자원 절감
+      * #### -> 정책을 만들고 세부사항을 미루는 시스템 개발
+      * ![img.png](src/main/imageFile/image3/img.png)
+    * ### 의존성 역전 -> 대표적인 경계(관심사 분리)를 만드는 방법 중 하나 
+      * ![img_1.png](src/main/imageFile/image3/img_1.png)
+    * ### 프로젝트에 적용할 기술 < 도메인
+      * ![img_2.png](src/main/imageFile/image3/img_2.png)
+      * ![img_3.png](src/main/imageFile/image3/img_3.png)
+    * ### 의존성 역전 (포트-어댑터 패턴)
+      * ![img_4.png](src/main/imageFile/image3/img_4.png)
+    * ### 인터페이스가 포트, 그것을 의존하는 객체들은 어댑터
+      * ![img_5.png](src/main/imageFile/image3/img_5.png)
+      * ![img_6.png](src/main/imageFile/image3/img_6.png)
+      * ![img_7.png](src/main/imageFile/image3/img_7.png)
+    * ### 인터페이스를 통해 명령을 입력하는 쪽 -> Input port - Input Adapter
+      * ![img_8.png](src/main/imageFile/image3/img_8.png)
+    * ### 인터페이스의 명령을 수행해서 출력하는 쪽 -> Output port - Output Adapter
+      * ![img_9.png](src/main/imageFile/image3/img_9.png)
+    * ### 개선된 아키텍처를 해체시키면 (레이어드 아키텍처 -> 클린 아키텍처와 헥사고날 아키텍처)
+      * ![img_10.png](src/main/imageFile/image3/img_10.png)
+      * ![img_11.png](src/main/imageFile/image3/img_11.png)
+      * ![img_12.png](src/main/imageFile/image3/img_12.png)
+      * ![img_13.png](src/main/imageFile/image3/img_13.png)
+      * ![img_14.png](src/main/imageFile/image3/img_14.png)
+      * ![img_15.png](src/main/imageFile/image3/img_15.png)
+      * ![img_16.png](src/main/imageFile/image3/img_16.png)
+      * ![img_17.png](src/main/imageFile/image3/img_17.png)
+      * ![img_18.png](src/main/imageFile/image3/img_18.png)
+      * ![img_19.png](src/main/imageFile/image3/img_19.png)
+      * ![img_20.png](src/main/imageFile/image3/img_20.png)
+      * ![img_21.png](src/main/imageFile/image3/img_21.png)
+    * ### 핵사고날 아키텍처의 장점
+      * ![img_22.png](src/main/imageFile/image3/img_22.png)
+      * ![img_23.png](src/main/imageFile/image3/img_23.png)
+      * ![img_24.png](src/main/imageFile/image3/img_24.png)
+    * ### 상하 대칭으로 표현
+      * ![img_25.png](src/main/imageFile/image3/img_25.png)
+    * ### 헥사고날 아키텍처 정리
+      * ![img_26.png](src/main/imageFile/image3/img_26.png)
+    * ### 클린 아키텍처
+      * ![img_27.png](src/main/imageFile/image3/img_27.png)
